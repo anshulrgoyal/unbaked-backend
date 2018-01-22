@@ -32,7 +32,7 @@ const user = require('../model/user');
 const comment = require("../model/comments");
 const middlewareobject = require("../middleware/middleware.js");
 router.get("/api/device/best", function (req, res) {
-    device.find({}).sort('-liked').exec(function (err,doc) {
+    device.find({}).sort('-like').exec(function (err,doc) {
         res.json({
             blog: doc,
         });
