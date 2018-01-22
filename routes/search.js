@@ -1,3 +1,7 @@
+
+
+
+
 var express = require("express");
 var router = express.Router();
 var mongoose = require('mongoose');
@@ -38,7 +42,7 @@ router.get('/api/like/:id', middlewareobject.checklogin,function (req, res) {
     })
 })
 router.get('/api/tag/:id',function(req,res){
-     var de=[""]
+    /* var de=[""]
     var promise=new Promise((resolve,reject)=>{
         device.findById(req.params.id).then((doc)=>{
    
@@ -52,7 +56,26 @@ router.get('/api/tag/:id',function(req,res){
     resolve(console.log(de))
 })
     })
-   
+    */
+     device.findById(req.params.id).then((doc)=>{
+      const action= doc.tags.map((data)=>{
+           /* return new Promise((resolve)=>{
+               const regex = new RegExp(escapeRegex(data), 'gi');
+               resolve(device.find({tags:regex}));
+            })*/
+            const regex = new RegExp(escapeRegex(data), 'gi');
+            return Promise.resolve(device.find({tags:regex}) )
+        })
+        Promise.all(action).then((blogs)=>{
+         const output=  [].concat(...blogs);
+        const result= Array.from(new Set (output.map((data)=>{
+             return JSON.stringify(data);
+         })))
+         res.json({blog:result.map((data)=>{
+             return JSON.parse(data)
+         })})
+        })
+    })
+    
 })
-
 module.exports = router;
