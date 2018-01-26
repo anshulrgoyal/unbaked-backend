@@ -25,6 +25,10 @@ const blog=new mongoose.Schema({
         type:mongoose.Schema.Types.ObjectId,
         ref:'user',
     }],
+    bookmarked:[{
+        type:mongoose.Schema.Types.ObjectId,
+        ref:'user'
+    }],
     readTime:{
         type:Number,
         default:0,

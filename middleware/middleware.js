@@ -17,7 +17,7 @@ middlewareobject.checklogin = function (req, res, next) {
 
                 return next();
             } else {
-                res.status(401).json({ message: 'Please login first' })
+                res.json({ message: 'Please login first' })
             }
         })
     }
@@ -33,19 +33,20 @@ middlewareobject.onwership = function check(req, res, next) {
             console.log(payload)
             if (payload) {
                 device.findById(req.params.id).populate('author').exec(function (err, newdevice) {
+                    console.log(newdevice.author._id)
+                    console.log(payload.userId)
+                    console.log(newdevice.author._id == payload.userId)
                     if (newdevice.author._id == payload.userId) {
                         next();
                     }
                 });
             } else {
-                res.status(401).json({ message: 'Please login first' })
+                res.json({ message: 'Please login first' })
             }
-        }).catch((err) => {
-            res.status(401).json({ message: 'try after some time' });
         })
     }
     catch (e) {
-        res.json({ message: 'please login first' })
+        res.json({ message: 'error' })
     }
 
 };

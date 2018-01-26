@@ -7,12 +7,15 @@ const middlewareoject = require("../middleware/middleware.js");
 const key=require('../conf/key')
 const cors=require('cors')
 const mailer=require('@sendgrid/mail')
+const mail=require('sparkpost')
+const sender=new mail('26eeddb03b0c819829ba93c9348f459170f3587f')
 router.post("/api/auth/signup",function(req,res){
    // console.log(req.body)
+   req.body.tags=req.body.tags.split(' ')
    user.create(req.body).then((user)=>{
        var token=jwt.sign({userId:user.id},key.tokenKey);
        const msg={
-           to:user.email,
+        to:user.email,
            from:'verification@unbakedpotato.herokuapp.com',
            subject:'Verify Your mail',
            html:`<strong><a href="https://unbakedpotato.herokuapp.com/user/${token}">Click Here</a> to verify</strong>`
@@ -23,6 +26,7 @@ mailer.send(msg)
            username:user.username,
            image:user.image,
            name:user.first,
+           tags:user.tags,
            activated:user.activated,
        })
    }).catch((err)=>{
@@ -59,7 +63,7 @@ router.post('/api/auth/signin',function(req,res){
         res.status(400).json({message:'Invalid Password/Username'});
     })
 })
-router.get('/user/:token',function(req,res){
+router.get('/api/user/:token',function(req,res){
     try {
         
         const token = req.params.token
@@ -71,11 +75,11 @@ router.get('/user/:token',function(req,res){
                    found.activation=true;
                    found.save();
                    console.log(found)
-                   res.send('verified')
+                   res.json({message:'verified'})
                })
                
             } else {
-                res.send('try after some time')
+                res.json({message:'not-verified'})
             }
         })
     }
@@ -83,5 +87,15 @@ router.get('/user/:token',function(req,res){
         res.send(e);
     }
 })
-
+router.get('/api/test',function(req,res){
+     const msg={
+        recipients: [
+            {address: user.email},
+          ],
+           from:'verification@unbakedpotato.herokuapp.com',
+           subject:'Verify Your mail',
+           html:`<strong><a href="https://unbakedpotato.herokuapp.com/user/">Click Here</a> to verify</strong>`
+       }
+sender.transmissions.send(msg)
+})
 module.exports = router;

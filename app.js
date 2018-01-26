@@ -11,8 +11,8 @@ const searchauth=require('./routes/search');
 const comment=require("./model/comments");
 const cors=require('cors')
 const mailer=require('@sendgrid/mail')
-mailer.setApiKey('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')
-mongoose.connect('mongodb://anshulrgoyal:8285578793aA#@ds141209.mlab.com:41209/unbaked',
+mailer.setApiKey('')
+mongoose.connect('',
 {useMongoClient:true});
 mongoose.Promise = global.Promise;
 app.use(bodyParser.json());
@@ -38,6 +38,7 @@ app.use(function(req,res,next){
     next()
 }
 })
+
 app.use(express.static(__dirname + '/public'))
 //app.use(express.static('View'))
 app.use(deviceroutes);
@@ -47,6 +48,6 @@ app.get("*",function(req,res){
 res.sendFile(__dirname+'/public/index.html');
 
 })
-app.listen(process.env.PORT||3000,function(){
+app.listen(process.env.PORT||3001,function(){
     console.log("done");
 })

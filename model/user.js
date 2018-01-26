@@ -2,13 +2,17 @@ var mongoose = require('mongoose');
 var bcrypt = require('bcryptjs')
 var userSchema = new mongoose.Schema({
     first: String,
-    email: {type:String},
+    email: {type:String,unique:true},
     image: {
     type:String,
     default:"default"
     },
     activation:{type:Boolean,default:false},
     tags: [String],
+    bookmark:[{
+        type:mongoose.Schema.Types.ObjectId,
+        ref:'device'
+    }],
     post: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'device',

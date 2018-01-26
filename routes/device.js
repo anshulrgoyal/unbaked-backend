@@ -54,6 +54,37 @@ router.get("/api/device/new", function (req, res) {
     });
 
 });
+router.get('/api/device/user',function(req,res){
+  try{
+    user.findById(req.user._id).then((doc)=>{
+        const action= doc.tags.map((data)=>{
+             /* return new Promise((resolve)=>{
+                 const regex = new RegExp(escapeRegex(data), 'gi');
+                 resolve(device.find({tags:regex}));
+              })*/
+              const regex = new RegExp(escapeRegex(data), 'gi');
+              return Promise.resolve(device.find({tags:regex}) )
+          })
+          Promise.all(action).then((blogs)=>{
+           const output=  [].concat(...blogs);
+          const result= Array.from(new Set (output.map((data)=>{
+               return JSON.stringify(data);
+           })))
+           res.json({blog:result.map((data)=>{
+               return JSON.parse(data)
+           })})
+          })
+      })
+  }  
+     catch(e){
+         device.find({}).then((doc)=>{
+res.json({
+    blog:doc
+})
+         })
+     } 
+  })
+
 router.get("/api/device/:id", function (req, res) {
     var id = req.params.id;
     var promise = device.findById(req.params.id).populate('author', 'first image').
@@ -76,7 +107,7 @@ router.post("/api",middlewareobject.checklogin, function (req, res) {
         var newdevice = new device(req.body)
         newdevice.author=req.user._id
         newdevice.save(function(err){
-            res.json(err)
+            res.json(newdevice)
         })
         
     ;
@@ -96,15 +127,14 @@ router.put("/api/device/:id",
             };
             device.findOne({
                 _id: req.params.id
-            }, function (err, doc) {
+            }).then((err, doc) =>{
                 doc.name = req.body.name;
                 doc.save();
                 doc.image = req.body.image;
                 doc.save();
                 doc.text = req.body.text;
-                doc.save().then(() => {
-                    res.json(doc);
-                })
+                doc.save()
+                res.json(doc)
 
            
         });
@@ -135,7 +165,16 @@ router.post("/api/device/:id", middlewareobject.checklogin, function (req, res) 
                     dev.comment.push(foundcomment);
                     dev.save();
                 }
-                res.json(foundcomment)
+                foundcomment.author.first=req.user.first;
+                foundcomment.author.image=req.user.image;
+                comm={
+                    text:foundcomment.text,
+                    author:{
+                        first:req.user.first,
+                        image:req.user.image
+                    }
+                }
+                res.json(comm)
 
             });
 
